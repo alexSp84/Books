@@ -11,6 +11,8 @@ import java.util.ArrayList;
 public class Book {
 
     private String title;
+    private String thumbnail;
+    ArrayList<String> authors = new ArrayList<>();
 
     public Book(String title) {
         this.title = title;
@@ -37,6 +39,13 @@ public class Book {
         try {
             title = jsonBook.getJSONObject("volumeInfo").getString("title");
 
+            JSONArray jsonAuthors = jsonBook.getJSONObject("volumeInfo").getJSONArray("authors");
+            for(int i = 0; i<jsonAuthors.length(); i++)
+                authors.add(jsonAuthors.getString(i));
+
+            thumbnail = jsonBook.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
+
+
         } catch (JSONException e) {
             Log.e("Book", e.getMessage());
         }
@@ -45,4 +54,13 @@ public class Book {
     public String getTitle() {
         return title;
     }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public ArrayList<String> getAuthors() {
+        return authors;
+    }
+
 }

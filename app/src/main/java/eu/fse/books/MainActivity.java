@@ -22,6 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -73,37 +75,44 @@ public class MainActivity extends AppCompatActivity {
     private void getBookFromURL(String textSearched) {
         // Make HTTP call
 
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "https://www.googleapis.com/books/v1/volumes?q=" + textSearched;
-
-        // Request a string response from the provided URL.
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        Log.d("jsonRequest", response.toString());
-
-                        try {
-                            JSONArray result = response.getJSONArray("items");
-                            mAdapter.clearBooksList();
-                            ArrayList<Book> bookListFromResponse = Book.getBooksList(result);
-                            mAdapter.addBooksList(bookListFromResponse);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                Toast.makeText(MainActivity.this, "Si è verificato un errore: "+error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
+        if(!textSearched.equals("")) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(this);
+            String url = null;
+            try {
+                url = "https://www.googleapis.com/books/v1/volumes?q=" + URLEncoder.encode(textSearched, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
-        });
 
-        // Add the request to the RequestQueue.
-        queue.add(jsonRequest);
+            // Request a string response from the provided URL.
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
 
+                            Log.d("jsonRequest", response.toString());
+
+                            try {
+                                JSONArray result = response.getJSONArray("items");
+                                mAdapter.clearBooksList();
+                                ArrayList<Book> bookListFromResponse = Book.getBooksList(result);
+                                mAdapter.addBooksList(bookListFromResponse);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    Toast.makeText(MainActivity.this, "Si è verificato un errore: " + error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
+                }
+            });
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+        } else
+            mAdapter.clearBooksList();
     }
 }
