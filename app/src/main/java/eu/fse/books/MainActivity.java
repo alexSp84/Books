@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     private void getBookFromURL(String textSearched) {
@@ -90,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-
                             Log.d("jsonRequest", response.toString());
 
                             try {

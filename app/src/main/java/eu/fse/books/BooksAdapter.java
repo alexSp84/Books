@@ -1,6 +1,7 @@
 package eu.fse.books;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,13 +26,26 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.ViewHolder> 
         public ImageView thumbnailImgV;
         public CardView card;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
 
             card = (CardView)itemView.findViewById(R.id.cv);
             titleTxtV = (TextView)itemView.findViewById(R.id.title_txt_view);
             authorsTxtV = (TextView) itemView.findViewById(R.id.authors_txt_view);
             thumbnailImgV = (ImageView)itemView.findViewById(R.id.thumbnail);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    String idBook = mDataset.get(getAdapterPosition()).getId();
+
+                    Intent openBookPage = new Intent(v.getContext(),BookActivity.class);
+                    openBookPage.putExtra("idbook", idBook);
+                    ((MainActivity)v.getContext()).startActivity(openBookPage);
+
+                }
+            });
         }
 
     }
@@ -60,7 +74,7 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(BooksAdapter.ViewHolder holder, int position) {
 
-        String authorsList = "";
+        String authorsList="";
         int sizeAuthorsList = mDataset.get(position).getAuthors().size();
 
         holder.titleTxtV.setText(mDataset.get(position).getTitle());

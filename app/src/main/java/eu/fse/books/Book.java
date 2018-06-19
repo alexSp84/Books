@@ -10,12 +10,12 @@ import java.util.ArrayList;
 
 public class Book {
 
-    private String title;
-    private String thumbnail;
+    private String id, title, thumbnail, publisher, description, language, subtitle, pages;
+
     ArrayList<String> authors = new ArrayList<>();
 
-    public Book(String title) {
-        this.title = title;
+    public Book(String id) {
+        this.id = id;
     }
 
     public static ArrayList<Book> getBooksList(JSONArray books){
@@ -37,6 +37,9 @@ public class Book {
 
     public Book(JSONObject jsonBook){
         try {
+
+            id = jsonBook.getString("id");
+
             title = jsonBook.getJSONObject("volumeInfo").getString("title");
 
             JSONArray jsonAuthors = jsonBook.getJSONObject("volumeInfo").getJSONArray("authors");
@@ -44,6 +47,16 @@ public class Book {
                 authors.add(jsonAuthors.getString(i));
 
             thumbnail = jsonBook.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
+
+            publisher = jsonBook.getJSONObject("volumeInfo").getString("publisher");
+
+            description = jsonBook.getJSONObject("volumeInfo").getString("description");
+
+            language = jsonBook.getJSONObject("volumeInfo").getString("language");
+
+            subtitle = jsonBook.getJSONObject("volumeInfo").getString("subtitle");
+
+            pages = jsonBook.getJSONObject("volumeInfo").getString("pageCount");
 
 
         } catch (JSONException e) {
@@ -63,4 +76,27 @@ public class Book {
         return authors;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public String getPages() {
+        return pages;
+    }
 }
