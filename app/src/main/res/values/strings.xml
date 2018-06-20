@@ -8,4 +8,5 @@
     <string name="edition_title">Edizione</string>
     <string name="pages_title">Pagine</string>
     <string name="sting_book_title">Titolo</string>
+    <string name="search_hint">Ricerca libro</string>
 </resources>

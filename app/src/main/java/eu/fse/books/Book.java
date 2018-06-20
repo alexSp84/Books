@@ -12,17 +12,17 @@ public class Book {
 
     private String id, title, thumbnail, publisher, description, language, subtitle, pages;
 
-    ArrayList<String> authors = new ArrayList<>();
+    private ArrayList<String> authors = new ArrayList<>();
 
     public Book(String id) {
         this.id = id;
     }
 
-    public static ArrayList<Book> getBooksList(JSONArray books){
+    public static ArrayList<Book> getBooksList(JSONArray books) {
 
         ArrayList<Book> list = new ArrayList<>();
 
-        for (int i = 0; i < books.length(); i++){
+        for (int i = 0; i < books.length(); i++) {
 
             try {
                 JSONObject jsonBook = books.getJSONObject(i);
@@ -35,7 +35,7 @@ public class Book {
         return list;
     }
 
-    public Book(JSONObject jsonBook){
+    public Book(JSONObject jsonBook) {
         try {
 
             id = jsonBook.getString("id");
@@ -43,8 +43,9 @@ public class Book {
             title = jsonBook.getJSONObject("volumeInfo").getString("title");
 
             JSONArray jsonAuthors = jsonBook.getJSONObject("volumeInfo").getJSONArray("authors");
-            for(int i = 0; i<jsonAuthors.length(); i++)
+            for (int i = 0; i < jsonAuthors.length(); i++)
                 authors.add(jsonAuthors.getString(i));
+
 
             thumbnail = jsonBook.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
 

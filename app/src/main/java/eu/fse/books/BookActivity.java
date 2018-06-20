@@ -35,15 +35,18 @@ public class BookActivity extends AppCompatActivity {
     Intent receivedBook;
     String idBook;
 
+    private RequestQueue queue;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
 
-        titleTxtView = (TextView)findViewById(R.id.title_txt_view);
-        cover = (ImageView)findViewById(R.id.cover_img_view);
+        titleTxtView = (TextView) findViewById(R.id.title_txt_view);
+        cover = (ImageView) findViewById(R.id.cover_img_view);
         authorsTxtView = (TextView) findViewById(R.id.authors_txt_view);
-        publisherTxtView = (TextView)findViewById(R.id.publisher_txt_view);
+        publisherTxtView = (TextView) findViewById(R.id.publisher_txt_view);
         descriptionTxtView = (TextView) findViewById(R.id.description_txt_view);
         authorsBio = (TextView) findViewById(R.id.authors_bio);
         titleBio = (TextView) findViewById(R.id.title_bio);
@@ -60,7 +63,14 @@ public class BookActivity extends AppCompatActivity {
 
     }
 
-    private void bindBook(Book book){
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(queue != null)
+            queue.cancelAll(MainActivity.TAG);
+    }
+
+    private void bindBook(Book book) {
         titleTxtView.setText(book.getTitle());
 
         Glide.with(cover.getContext())
@@ -70,10 +80,10 @@ public class BookActivity extends AppCompatActivity {
         String authorsList = "";
         int sizeAuthorsList = book.getAuthors().size();
 
-        for(int i = 0; i < sizeAuthorsList; i++){
-            authorsList+= book.getAuthors().get(i);
-            if(i<sizeAuthorsList-1)
-                authorsList+=", ";
+        for (int i = 0; i < sizeAuthorsList; i++) {
+            authorsList += book.getAuthors().get(i);
+            if (i < sizeAuthorsList - 1)
+                authorsList += ", ";
         }
 
         authorsTxtView.setText(authorsList);
@@ -98,39 +108,40 @@ public class BookActivity extends AppCompatActivity {
     private void getBookInfoFromURL(String id) {
         // Make HTTP call
 
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(this);
-            String url = null;
+        // Instantiate the RequestQueue.
+        queue = Volley.newRequestQueue(this);
+        String url = null;
 
-            try {
-                findViewById(R.id.loading).setVisibility(View.VISIBLE);
-                url = "https://www.googleapis.com/books/v1/volumes/" + URLEncoder.encode(id, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        try {
+            findViewById(R.id.loading).setVisibility(View.VISIBLE);
+            url = "https://www.googleapis.com/books/v1/volumes/" + URLEncoder.encode(id, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        findViewById(R.id.loading).setVisibility(View.GONE);
+                        Log.d("jsonRequest", response.toString());
+
+                        bindBook(new Book(response));
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                findViewById(R.id.loading).setVisibility(View.GONE);
+                Toast.makeText(BookActivity.this, "Si è verificato un errore: " + error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
             }
+        });
 
-            // Request a string response from the provided URL.
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            findViewById(R.id.loading).setVisibility(View.GONE);
-                            Log.d("jsonRequest", response.toString());
-
-                            bindBook(new Book(response));
-
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    findViewById(R.id.loading).setVisibility(View.GONE);
-                    Toast.makeText(BookActivity.this, "Si è verificato un errore: " + error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
-                }
-            });
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-
+        // Set the tag on the request.
+        jsonRequest.setTag(MainActivity.TAG);
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
 
     }
 

@@ -37,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Book> myDataset;
 
+    private RequestQueue queue;
+    public static final String TAG = "StopRequest";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +66,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String textSearched = searchEdTxt.getText().toString();
+                findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.GONE);
+                if(queue != null)
+                    queue.cancelAll(TAG);
                 getBookFromURL(textSearched);
+
             }
 
             @Override
@@ -74,13 +82,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(queue != null)
+            queue.cancelAll(TAG);
+    }
+
     private void getBookFromURL(String textSearched) {
         // Make HTTP call
 
-        if(!textSearched.equals("")) {
+        if (!textSearched.equals("")) {
+
             // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(this);
+            queue = Volley.newRequestQueue(this);
             String url = null;
+
             try {
                 url = "https://www.googleapis.com/books/v1/volumes?q=" + URLEncoder.encode(textSearched, "UTF-8");
             } catch (UnsupportedEncodingException e) {
@@ -92,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
+                            findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                            mRecyclerView.setVisibility(View.VISIBLE);
                             Log.d("jsonRequest", response.toString());
 
                             try {
@@ -111,9 +130,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+            // Set the tag on the request.
+            jsonRequest.setTag(TAG);
+
             // Add the request to the RequestQueue.
             queue.add(jsonRequest);
-        } else
+
+        } else{
             mAdapter.clearBooksList();
+            findViewById(R.id.progress_bar).setVisibility(View.GONE);
+        }
     }
 }
