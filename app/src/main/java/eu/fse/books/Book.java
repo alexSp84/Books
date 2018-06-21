@@ -35,34 +35,31 @@ public class Book {
         return list;
     }
 
-    public Book(JSONObject jsonBook) {
-        try {
+    public Book(JSONObject jsonBook) throws JSONException {
 
-            id = jsonBook.getString("id");
+        id = jsonBook.getString("id");
+        JSONObject volumeInfo = jsonBook.getJSONObject("volumeInfo");
 
-            title = jsonBook.getJSONObject("volumeInfo").getString("title");
+        title = volumeInfo.optString("title", "No Title");
 
-            JSONArray jsonAuthors = jsonBook.getJSONObject("volumeInfo").getJSONArray("authors");
+        JSONArray jsonAuthors = volumeInfo.optJSONArray("authors");
+        if (jsonAuthors != null) {
             for (int i = 0; i < jsonAuthors.length(); i++)
                 authors.add(jsonAuthors.getString(i));
+        } else authors.add("");
 
+        thumbnail = volumeInfo.getJSONObject("imageLinks").optString("thumbnail", "No Image");
 
-            thumbnail = jsonBook.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
+        publisher = volumeInfo.optString("publisher", "");
 
-            publisher = jsonBook.getJSONObject("volumeInfo").getString("publisher");
+        description = volumeInfo.optString("description", "No Description");
 
-            description = jsonBook.getJSONObject("volumeInfo").getString("description");
+        language = volumeInfo.optString("language", "");
 
-            language = jsonBook.getJSONObject("volumeInfo").getString("language");
+        subtitle = volumeInfo.optString("subtitle", "");
 
-            subtitle = jsonBook.getJSONObject("volumeInfo").getString("subtitle");
+        pages = volumeInfo.optString("pageCount", "");
 
-            pages = jsonBook.getJSONObject("volumeInfo").getString("pageCount");
-
-
-        } catch (JSONException e) {
-            Log.e("Book", e.getMessage());
-        }
     }
 
     public String getTitle() {

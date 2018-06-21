@@ -1,6 +1,8 @@
 package eu.fse.books;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private RequestQueue queue;
     public static final String TAG = "StopRequest";
 
+    public static final int EDIT_REQUEST = 1001;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 String textSearched = searchEdTxt.getText().toString();
                 findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
                 mRecyclerView.setVisibility(View.GONE);
-                if(queue != null)
+                if (queue != null)
                     queue.cancelAll(TAG);
                 getBookFromURL(textSearched);
 
@@ -80,12 +84,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        if(getIntent() != null) {
+            Intent receivedSearch = getIntent();
+            String authorSearch = receivedSearch.getStringExtra("author");
+            searchEdTxt.setText(authorSearch);
+        }
+
     }
+
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(queue != null)
+        if (queue != null)
             queue.cancelAll(TAG);
     }
 
@@ -136,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             // Add the request to the RequestQueue.
             queue.add(jsonRequest);
 
-        } else{
+        } else {
             mAdapter.clearBooksList();
             findViewById(R.id.progress_bar).setVisibility(View.GONE);
         }

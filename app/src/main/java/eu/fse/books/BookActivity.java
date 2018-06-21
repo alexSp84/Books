@@ -1,5 +1,6 @@
 package eu.fse.books;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -37,7 +38,6 @@ public class BookActivity extends AppCompatActivity {
 
     private RequestQueue queue;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +61,16 @@ public class BookActivity extends AppCompatActivity {
 
         getBookInfoFromURL(idBook);
 
+        authorsBio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent authorSearch = new Intent(v.getContext(),MainActivity.class);
+                authorSearch.putExtra("author", authorsBio.getText().toString());
+                startActivity(authorSearch);
+            }
+        });
+
     }
 
     @Override
@@ -81,9 +91,8 @@ public class BookActivity extends AppCompatActivity {
         int sizeAuthorsList = book.getAuthors().size();
 
         for (int i = 0; i < sizeAuthorsList; i++) {
+            if(i > 0) authorsList+=", ";
             authorsList += book.getAuthors().get(i);
-            if (i < sizeAuthorsList - 1)
-                authorsList += ", ";
         }
 
         authorsTxtView.setText(authorsList);
@@ -125,9 +134,15 @@ public class BookActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         findViewById(R.id.loading).setVisibility(View.GONE);
+                        findViewById(R.id.all_view).setVisibility(View.VISIBLE);
                         Log.d("jsonRequest", response.toString());
 
-                        bindBook(new Book(response));
+                        try {
+                            bindBook(new Book(response));
+                        } catch (JSONException e) {
+                            Toast.makeText(BookActivity.this, "Si è verificato un errore", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
 
                     }
                 }, new Response.ErrorListener() {
@@ -144,5 +159,6 @@ public class BookActivity extends AppCompatActivity {
         queue.add(jsonRequest);
 
     }
+
 
 }

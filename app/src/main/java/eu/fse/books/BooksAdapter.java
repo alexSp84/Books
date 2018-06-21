@@ -80,9 +80,8 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.ViewHolder> 
         holder.titleTxtV.setText(mDataset.get(position).getTitle());
 
         for(int i = 0; i < sizeAuthorsList; i++){
+            if(i > 0) authorsList+=", ";
             authorsList+= mDataset.get(position).getAuthors().get(i);
-            if(i<sizeAuthorsList-1)
-                authorsList+=", ";
         }
 
         holder.authorsTxtV.setText(authorsList);
